@@ -1,15 +1,12 @@
 use nalgebra::DMatrix;
 
-use crate::argparse;
 use crate::common::{Knot, SplineSegment};
 
+const CONSTRAINTS_PER_SPLINE_SEGMENT: usize = 4; // rows per segment in linear system
+const PARAMETERS_PER_SPLINE_SEGMENT: usize = 4; // cols per segment in linear system
 
-const CONSTRAINTS_PER_SPLINE_SEGMENT: usize = 4;  // rows per segment in linear system
-const PARAMETERS_PER_SPLINE_SEGMENT: usize = 4;  // cols per segment in linear system
-
-
-pub fn interpolate(config: argparse::InterpolateConfig) {
-    let knots: Vec<Knot> = load_knots(&config.input_path);
+pub fn interpolate(input_path: &str, output_path: &str) {
+    let knots: Vec<Knot> = load_knots(input_path);
 
     let num_spline_segments = knots.len() - 1;
     let nrows = num_spline_segments * CONSTRAINTS_PER_SPLINE_SEGMENT;
@@ -95,7 +92,7 @@ pub fn interpolate(config: argparse::InterpolateConfig) {
     dbg!(&spline);
 
     // Export the splines into a CSV
-    save_spline(&config.output_path, &spline);
+    save_spline(output_path, &spline);
 }
 
 fn load_knots(input_path: &str) -> Vec<Knot> {

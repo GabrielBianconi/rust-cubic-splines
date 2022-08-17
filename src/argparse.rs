@@ -34,7 +34,7 @@ pub fn parse() -> Config {
                 }
                 "evaluate" => {
                     let input_path = args.next().expect("Please enter the input path.");
-                    
+
                     Config::Evaluate(EvaluateConfig { input_path })
                 }
                 _ => panic!("Please enter a valid command."),
