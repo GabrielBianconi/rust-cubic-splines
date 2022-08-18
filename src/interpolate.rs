@@ -108,11 +108,12 @@ fn load_knots(input_path: &str) -> Vec<Knot> {
         .expect("Failed to parse input CSV.");
 
     // Ensure the knots are finite floats
-    knots
-        .iter()
-        .all(|knot| knot.x.is_finite() && knot.y.is_finite())
-        .then(|| ())
-        .expect("Invalid floats in the input CSV.");
+    assert!(
+        knots
+            .iter()
+            .all(|knot| knot.x.is_finite() && knot.y.is_finite()),
+        "Invalid floats in the input CSV."
+    );
 
     // Sort knots by x component
     // (`unwrap` will never trigger since we've checked for finiteness above)
@@ -121,9 +122,10 @@ fn load_knots(input_path: &str) -> Vec<Knot> {
     // Ensure the knots x positions are unique (requires sorting, above)
     let nknots = knots.len();
     knots.dedup_by_key(|knot| knot.x);
-    (knots.len() == nknots)
-        .then(|| ())
-        .expect("Found duplicate knot x positions in input.");
+    assert!(
+        knots.len() == nknots,
+        "Found duplicate knot x positions in input."
+    );
 
     knots
 }

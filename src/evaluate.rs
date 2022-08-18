@@ -55,18 +55,17 @@ fn load_spline(input_path: &str) -> Vec<SplineSegment> {
         .expect("Failed to parse input CSV.");
 
     // Ensure the knots are finite floats
-    spline
-        .iter()
-        .all(|segment| {
+    assert!(
+        spline.iter().all(|segment| {
             segment.a.is_finite()
                 && segment.b.is_finite()
                 && segment.c.is_finite()
                 && segment.d.is_finite()
                 && segment.knot0.is_finite()
                 && segment.knot1.is_finite()
-        })
-        .then(|| ())
-        .expect("Invalid floats in the input CSV.");
+        }),
+        "Invalid floats in the input CSV."
+    );
 
     // TODO: validate the spline is continuous and properly sorted
 
