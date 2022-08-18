@@ -1,12 +1,14 @@
 mod argparse;
 mod common;
+mod evaluate;
 mod interpolate;
 
-use interpolate::interpolate;
+use evaluate::run_evaluate;
+use interpolate::run_interpolate;
 
 fn main() {
     match argparse::parse() {
-        argparse::Config::Interpolate(c) => interpolate(&c.input_path, &c.output_path),
-        argparse::Config::Evaluate(_) => panic!("evaluate still not implemented."),
-    }
+        argparse::Config::Interpolate(c) => run_interpolate(c),
+        argparse::Config::Evaluate(c) => run_evaluate(c),
+    };
 }

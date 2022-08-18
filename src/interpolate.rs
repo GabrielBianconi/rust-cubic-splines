@@ -1,13 +1,20 @@
 use nalgebra::DMatrix;
 
-use crate::common::{Knot, SplineSegment};
+use crate::{
+    argparse::InterpolateConfig,
+    common::{Knot, SplineSegment},
+};
 
 const CONSTRAINTS_PER_SPLINE_SEGMENT: usize = 4; // rows per segment in linear system
 const PARAMETERS_PER_SPLINE_SEGMENT: usize = 4; // cols per segment in linear system
 
-pub fn interpolate(input_path: &str, output_path: &str) {
-    let knots: Vec<Knot> = load_knots(input_path);
+pub fn run_interpolate(config: InterpolateConfig) {
+    let knots: Vec<Knot> = load_knots(&config.input_path);
+    let spline: Vec<SplineSegment> = interpolate(&knots);
+    save_spline(&config.output_path, &spline);
+}
 
+pub fn interpolate(knots: &[Knot]) -> Vec<SplineSegment> {
     let num_spline_segments = knots.len() - 1;
     let nrows = num_spline_segments * CONSTRAINTS_PER_SPLINE_SEGMENT;
     let ncols = num_spline_segments * PARAMETERS_PER_SPLINE_SEGMENT;
@@ -89,10 +96,7 @@ pub fn interpolate(input_path: &str, output_path: &str) {
         spline.push(segment);
     }
 
-    dbg!(&spline);
-
-    // Export the splines into a CSV
-    save_spline(output_path, &spline);
+    spline
 }
 
 fn load_knots(input_path: &str) -> Vec<Knot> {
@@ -124,7 +128,7 @@ fn load_knots(input_path: &str) -> Vec<Knot> {
     knots
 }
 
-fn save_spline(output_path: &str, spline: &Vec<SplineSegment>) {
+fn save_spline(output_path: &str, spline: &[SplineSegment]) {
     let mut wtr = csv::Writer::from_path(output_path).expect("Failed to open output CSV.");
 
     for segment in spline {

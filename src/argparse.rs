@@ -9,6 +9,7 @@ pub struct InterpolateConfig {
 #[derive(Debug)]
 pub struct EvaluateConfig {
     pub input_path: String,
+    pub values: Vec<f64>,
 }
 
 #[derive(Debug)]
@@ -21,32 +22,31 @@ pub fn parse() -> Config {
     let mut args = env::args().skip(1); // ignore the path
 
     match &args.next() {
-        Some(command) => {
-            let config = match command.as_str() {
-                "interpolate" => {
-                    let input_path = args.next().expect("Please enter the input path.");
-                    let output_path = args.next().expect("Please enter the output path.");
+        Some(command) => match command.as_str() {
+            "interpolate" => {
+                let input_path = args.next().expect("Please enter the input path.");
+                let output_path = args.next().expect("Please enter the output path.");
 
-                    Config::Interpolate(InterpolateConfig {
-                        input_path,
-                        output_path,
-                    })
-                }
-                "evaluate" => {
-                    let input_path = args.next().expect("Please enter the input path.");
+                assert!(
+                    args.next().is_none(),
+                    "You entered too many arguments for this command."
+                );
 
-                    Config::Evaluate(EvaluateConfig { input_path })
-                }
-                _ => panic!("Please enter a valid command."),
-            };
+                Config::Interpolate(InterpolateConfig {
+                    input_path,
+                    output_path,
+                })
+            }
+            "evaluate" => {
+                let input_path: String = args.next().expect("Please enter the input path.");
+                let values: Vec<f64> = args
+                    .map(|value| value.parse().unwrap())
+                    .collect::<Vec<f64>>();
 
-            assert!(
-                args.next().is_none(),
-                "You entered too many arguments for this command."
-            );
-
-            config
-        }
+                Config::Evaluate(EvaluateConfig { input_path, values })
+            }
+            _ => panic!("Please enter a valid command."),
+        },
         _ => {
             panic!("Please enter a command.")
         }
